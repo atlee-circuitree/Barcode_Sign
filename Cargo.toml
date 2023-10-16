@@ -1,5 +1,5 @@
 [package]
-name = "Barcode_Sign"
+name = "barcode_sign"
 version = "0.1.0"
 edition = "2021"
 
