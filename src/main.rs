@@ -8,31 +8,41 @@ SQL Logic goal
 */
 use std::io;
 use std::error::Error;
+use rusqlite::{Connection, Result};
 
 fn main() -> Result<(), Box<dyn Error>> {
 
-    let connection = sqlite::open("test.db")?;
+    let connection = Connection::open("test.db")?;
 
     let query_init = "CREATE TABLE IF NOT EXISTS logs (id INT, act CHAR, time TEXT)";
-    connection.execute(query_init)?;
+    connection.execute(query_init, ())?;
     
     loop {
-        let input = strin();
+        let input: String = strin();
         if input == "X" {
             break
         };
 
-        let id: &str = &input[1..];
-        let act: &str = &input[..1];
-        let query = format!("INSERT INTO logs VALUES ({id}, '{act}', datetime('now'));");
-        connection.execute(query)?;
+        let id:String = String::from(&input[1..]);
+        let id_int = match id.parse::<i32>() {
+            Ok(i) => i,
+            _ => 0
+        };
+        
+        let mut act: String = String::from(&input[..1]);
+        if act.len() > 1 {
+            act = "x".to_string();
+        }
+
+        let query: String = format!("INSERT INTO logs VALUES ({id_int}, '{act}', datetime('now'));");
+        connection.execute(&query, ())?;
     }
     Ok(())
 }
 
 fn strin() -> String {
     let mut buffer = String::new();
-    let _ = io::stdin().read_line(&mut buffer);
+    io::stdin().read_line(&mut buffer).unwrap();
     buffer = String::from(buffer.trim());
     buffer
 }
