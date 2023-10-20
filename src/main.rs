@@ -1,4 +1,3 @@
-
 /*
 SQL Logic goal
 - take a row
@@ -13,4 +12,3 @@ fn main() -> Result<(), Box<dyn Error>> {
     program::log()?;
     Ok(())
 }
-
