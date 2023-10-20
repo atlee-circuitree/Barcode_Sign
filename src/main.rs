@@ -6,6 +6,7 @@ SQL Logic goal
 - if action is o (out) record the duration and write to another table
 */
 use std::error::Error;
+
 mod program;
 
 fn main() -> Result<(), Box<dyn Error>> {
