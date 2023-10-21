@@ -138,10 +138,6 @@ fn strin() -> String {
 fn find_logout(table: &Vec<Entry>, session_start: usize) -> Option<Session>{
     let start_entry = table[session_start].clone();
     let future_entries = &table[(session_start + 1)..];
-    for entry in future_entries {
-        let entry = entry.clone();
-        entry._print();
-    }
     println!();
     for e in future_entries {
         let entry = e.clone();
