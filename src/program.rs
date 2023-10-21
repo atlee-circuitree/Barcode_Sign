@@ -22,7 +22,7 @@ pub struct Session {
     out_time: String,
 }
 impl Session {
-    pub fn print(self) {
+    pub fn _print(self) {
         println!("ID {}, IN TIME {}, OUT TIME {}", self.id, self.in_time, self.out_time);
     }
 }
@@ -106,9 +106,15 @@ pub fn _analyze() -> Result<(), Box<dyn Error>> {
         }
         
     }
-    for i in sessions {
-        i.print();
-    }
+    //conn.execute("CREATE TABLE IF NOT EXISTS sessions (id INT, timein TEXT, timeout TEXT, duration TEXT);", ()).expect("sql 1 error");
+    
+    //for session in sessions {
+    //    
+    //    let query = format!("INSERT INTO sessions VALUES ({}, '{}', '{}', DATETIME(UNIXEPOCH({}) - UNIXEPOCH({}), 'unixepoch'));", 
+    //    session.id , session.in_time, session.out_time, session.out_time, session.in_time);
+    //    conn.execute(&query, ()).expect("sql 2 error");
+    //}
+
     Ok(())
 }
 
