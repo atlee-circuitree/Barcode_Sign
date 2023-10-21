@@ -77,10 +77,18 @@ pub fn _analyze() -> Result<(), Box<dyn Error>> {
     for entry in logs_iter {
         entries.push(entry?)
     }
-    let session = find_logout(&entries, 0);
-    match session {
-        Some(a) =>  a.print(),
-        None => println!("Error"),
+    
+
+    let mut sessions: Vec<Session> = Vec::new();
+
+    for i in 0..(entries.len()-1) {
+        match find_logout(&entries, i) {
+            Some(a) => sessions.push(a),
+            None => (),
+        }
+    }
+    for i in sessions {
+        i.print();
     }
     Ok(())
 }
