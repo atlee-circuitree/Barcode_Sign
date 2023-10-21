@@ -1,11 +1,28 @@
 use rusqlite::{Connection, Result};
 use std::error::Error;
 use std::io;
-
-struct Entry {
+#[derive(Debug, Clone)]
+pub struct Entry {
     id: i32,
     act: String,
     time: String,
+}
+
+impl Entry {
+    pub fn print(self) {
+        println!("ID {}, ACTION {}, TIME {}", self.id, self.act, self.time)
+    }
+
+}
+pub struct Session {
+    id: i32,
+    in_time: String,
+    out_time: String,
+}
+impl Session {
+    pub fn print(self) {
+        println!("ID {}, IN TIME {}, OUT TIME {}", self.id, self.in_time, self.out_time);
+    }
 }
 enum _ProgramState {
     Logging,
@@ -60,10 +77,15 @@ pub fn _analyze() -> Result<(), Box<dyn Error>> {
     for entry in logs_iter {
         entries.push(entry?)
     }
-    let entry_one = &entries[0]; 
-    println!("{}, {}, {}", entry_one.act, entry_one.time, entry_one.id);
+    let session = find_logout(&entries, 0);
+    match session {
+        Some(a) =>  a.print(),
+        None => println!("Error"),
+    }
     Ok(())
 }
+
+
 
 pub fn _display() {
     todo!();
@@ -78,4 +100,33 @@ fn strin() -> String {
     io::stdin().read_line(&mut buffer).unwrap();
     buffer = String::from(buffer.trim());
     buffer
+}
+
+fn find_logout(table: &Vec<Entry>, session_start: usize) -> Option<Session>{
+    let start_entry = table[session_start].clone();
+    let future_entries = &table[(session_start + 1)..];
+    for e in future_entries {
+        let entry = e.clone();
+        if entry.id == start_entry.id {
+            match entry.act.as_str() {
+                "i" => {
+                    let s = Session{
+                        id: start_entry.id,
+                        in_time: start_entry.time.clone(),
+                        out_time: entry.time.clone(),
+                    };
+                    return Some(s)
+                },
+                _ => {
+                    let s = Session{
+                        id: start_entry.id,
+                        in_time: start_entry.time.clone(),
+                        out_time: start_entry.time.clone(),
+                    };
+                    return Some(s)
+                }
+            }
+        }
+    }
+    return None
 }

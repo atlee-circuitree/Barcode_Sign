@@ -11,5 +11,6 @@ mod program;
 
 fn main() -> Result<(), Box<dyn Error>> {
     program::log()?;
+    program::_analyze()?;
     Ok(())
 }
