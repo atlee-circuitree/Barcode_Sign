@@ -106,14 +106,15 @@ pub fn _analyze() -> Result<(), Box<dyn Error>> {
         }
         
     }
-    //conn.execute("CREATE TABLE IF NOT EXISTS sessions (id INT, timein TEXT, timeout TEXT, duration TEXT);", ()).expect("sql 1 error");
+    conn.execute("DROP TABLE IF EXISTS sessions;", ())?;
+    conn.execute("CREATE TABLE IF NOT EXISTS sessions (id INT, timein TEXT, timeout TEXT, duration TEXT);", ())?;
     
-    //for session in sessions {
-    //    
-    //    let query = format!("INSERT INTO sessions VALUES ({}, '{}', '{}', DATETIME(UNIXEPOCH({}) - UNIXEPOCH({}), 'unixepoch'));", 
-    //    session.id , session.in_time, session.out_time, session.out_time, session.in_time);
-    //    conn.execute(&query, ()).expect("sql 2 error");
-    //}
+    for session in sessions {
+        
+        let query = format!("INSERT INTO sessions VALUES ({}, '{}', '{}', strftime('%s','{}') - strftime('%s','{}'));", 
+        session.id , session.in_time, session.out_time, session.out_time, session.in_time);
+        conn.execute(&query, ()).expect("sql 2 error");
+    }
 
     Ok(())
 }
