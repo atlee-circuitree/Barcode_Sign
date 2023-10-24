@@ -1,6 +1,8 @@
 use rusqlite::{Connection, Result};
 use std::error::Error;
-use std::io;
+use std::{io, option};
+use cliclack::*;
+
 #[derive(Debug, Clone)]
 pub struct Entry {
     id: i32,
@@ -171,4 +173,29 @@ fn find_logout(table: &Vec<Entry>, session_start: usize) -> Option<Session>{
         }
     }
     return None
+}
+
+pub struct User {
+    f_name: String,
+    l_name: String,
+    id: i32,
+    //role: String,
+    //leadership: Option<i32>,
+}
+pub fn _register() -> Result<(), Box<dyn Error>> {
+    //let qr_code = qr_code::QrCode::new(b"Hello").unwrap();
+    //let bmp = qr_code.to_bmp();
+    //bmp.write(std::fs::File::create("test.bmp").unwrap()).unwrap();
+
+    let conn = Connection::open("test.db")?;
+    conn.execute("CREATE TABLE IF NOT EXISTS users (text firstName, text lastName, text role, int id )", ())?;
+    intro("User registration process")?;
+    loop {
+        let f_name: String = input("First name: ").interact()?;
+        let l_name: String = input("Last name name: ").interact()?;
+        let id: i32 = input("Id number:").interact()?;
+        break;
+    }
+    outro("Registration done")?;
+    Ok(())
 }
