@@ -10,7 +10,7 @@ use std::error::Error;
 mod program;
 
 fn main() -> Result<(), Box<dyn Error>> {
-    
+    program::_register()?;
     program::log()?;
     program::_analyze()?;
     Ok(())

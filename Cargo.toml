@@ -10,5 +10,5 @@ chrono = "0.4.31"
 cliclack = "0.1.9"
 eyre = "0.6.8"
 image = "0.22.0"
-qr_code = {version = "2.0.0", features = ["bmp"]}
+qrcode-generator = "4.1.9"
 rusqlite = { version = "0.29.0", features = ["bundled"] }

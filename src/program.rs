@@ -1,7 +1,11 @@
+
 use rusqlite::{Connection, Result};
 use std::error::Error;
-use std::{io, option};
+use std::io;
 use cliclack::*;
+use qrcode_generator::QrCodeEcc;
+
+
 
 #[derive(Debug, Clone)]
 pub struct Entry {
@@ -176,8 +180,8 @@ fn find_logout(table: &Vec<Entry>, session_start: usize) -> Option<Session>{
 }
 
 pub struct User {
-    f_name: String,
-    l_name: String,
+    first_name: String,
+    last_name: String,
     id: i32,
     //role: String,
     //leadership: Option<i32>,
@@ -188,12 +192,23 @@ pub fn _register() -> Result<(), Box<dyn Error>> {
     //bmp.write(std::fs::File::create("test.bmp").unwrap()).unwrap();
 
     let conn = Connection::open("test.db")?;
-    conn.execute("CREATE TABLE IF NOT EXISTS users (text firstName, text lastName, text role, int id )", ())?;
+    conn.execute("CREATE TABLE IF NOT EXISTS users (firstName TEXT, lastName TEXT, id INT )", ())?;
     intro("User registration process")?;
     loop {
+        
         let f_name: String = input("First name: ").interact()?;
         let l_name: String = input("Last name name: ").interact()?;
-        let id: i32 = input("Id number:").interact()?;
+        let id1: i32 = input("Id number:").interact()?;
+        let user: User = User {
+            first_name: f_name,
+            last_name: l_name,
+            id: id1,
+        };
+        let query = format!("INSERT INTO users VALUES ('{}', '{}', {});", user.first_name, user.last_name, user.id);
+        conn.execute(&query, ())?;
+        let path = format!("/img/i{}.png", user.id);
+        let text = format!("i{}", user.id);
+        qrcode_generator::to_png_to_file(text, QrCodeEcc::Low, 1024, path).unwrap();
         break;
     }
     outro("Registration done")?;
