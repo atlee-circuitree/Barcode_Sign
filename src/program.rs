@@ -1,7 +1,6 @@
 
 use rusqlite::{Connection, Result};
 use std::error::Error;
-use std::io;
 use cliclack::*;
 use qrcode_generator::QrCodeEcc;
 
@@ -9,9 +8,9 @@ use qrcode_generator::QrCodeEcc;
 
 #[derive(Debug, Clone)]
 pub struct Entry {
-    id: i32,
-    act: i32,
-    time: String,
+    pub id: i32,
+    pub act: i32,
+    pub time: String,
 }
 
 impl Entry {
@@ -23,9 +22,9 @@ impl Entry {
 
 #[derive(Debug, Clone)]
 pub struct Session {
-    id: i32,
-    in_time: String,
-    out_time: String,
+    pub id: i32,
+    pub in_time: String,
+    pub out_time: String,
 }
 impl Session {
     pub fn _print(self) {
@@ -52,21 +51,21 @@ pub fn log() -> Result<(), Box<dyn Error>> {
 
     let query_init = "CREATE TABLE IF NOT EXISTS logs (id INT, act BIT, time TEXT)";
     connection.execute(query_init, ())?;
-
+    intro("Logging process")?;
     loop {
-        let input: String = strin();
-        if input == "X" {
+        let i: String = input("Scan Code").interact()?;
+        if i == "X" {
             break;
         };
 
-        let id: String = String::from(&input[1..]);
+        let id: String = String::from(&i[1..]);
         let id_int = match id.parse::<i32>() {
             Ok(i) => i,
             _ => 0,
         };
         
 
-        let act = &input[..1];
+        let act = &i[..1];
 
         let act = match act {
             "i" => 1,
@@ -77,6 +76,7 @@ pub fn log() -> Result<(), Box<dyn Error>> {
             format!("INSERT INTO logs VALUES ({id_int}, {act}, datetime('now'));");
         connection.execute(&query, ())?;
     }
+    outro("")?;
     Ok(())
 }
 
@@ -137,13 +137,6 @@ pub fn _export() {
     todo!();
 }
 
-// just a shorthand for taking input. probably will replace with a CLI library later
-fn strin() -> String {
-    let mut buffer = String::new();
-    io::stdin().read_line(&mut buffer).unwrap();
-    buffer = String::from(buffer.trim());
-    buffer
-}
 
 //iterates through the list of entries, finding the next one with the same id
 //then makes a struct with the time of that entry if it is a logout, or with the same time if it is a login
@@ -179,6 +172,7 @@ fn find_logout(table: &Vec<Entry>, session_start: usize) -> Option<Session>{
     return None
 }
 
+//note to self: role and leadership should be enums
 pub struct User {
     first_name: String,
     last_name: String,
@@ -186,11 +180,12 @@ pub struct User {
     //role: String,
     //leadership: Option<i32>,
 }
-pub fn _register() -> Result<(), Box<dyn Error>> {
-    //let qr_code = qr_code::QrCode::new(b"Hello").unwrap();
-    //let bmp = qr_code.to_bmp();
-    //bmp.write(std::fs::File::create("test.bmp").unwrap()).unwrap();
 
+//loop to register a user
+pub fn _register() -> Result<(), Box<dyn Error>> {
+    
+
+    //too many question marks. how does any of this even fail?
     let conn = Connection::open("test.db")?;
     conn.execute("CREATE TABLE IF NOT EXISTS users (firstName TEXT, lastName TEXT, id INT )", ())?;
     intro("User registration process")?;
@@ -206,10 +201,23 @@ pub fn _register() -> Result<(), Box<dyn Error>> {
         };
         let query = format!("INSERT INTO users VALUES ('{}', '{}', {});", user.first_name, user.last_name, user.id);
         conn.execute(&query, ())?;
-        let path = format!("/img/i{}.png", user.id);
+
+        //reminder to make a struct to automate this. 
+        let path = format!("./qr/users/i{}.png", user.id);
         let text = format!("i{}", user.id);
         qrcode_generator::to_png_to_file(text, QrCodeEcc::Low, 1024, path).unwrap();
-        break;
+        //you get one qr code. no more
+        let path = format!("./qr/users/o{}.png", user.id);
+        let text = format!("o{}", user.id);
+        qrcode_generator::to_png_to_file(text, QrCodeEcc::Low, 1024, path).unwrap();
+
+        //string slice black magic
+        let inp: String = input("Continue? [Y/n]").interact()?;
+        let inpu = &inp[..];
+        match inpu {
+            "n" => break,
+            _ => ()
+        }; 
     }
     outro("Registration done")?;
     Ok(())
